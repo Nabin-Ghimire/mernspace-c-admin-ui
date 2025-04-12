@@ -3,8 +3,9 @@ import { LockFilled, LockOutlined, UserOutlined } from '@ant-design/icons'
 import Logo from "../../components/icons/Logo"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { Credentials } from "../../types"
-import { login, self } from "../../http/api"
+import { login, logout, self } from "../../http/api"
 import { userAuthStore } from "../../store"
+import { usePermission } from "../../hooks/usePermission"
 
 const loginUser = async (credentials: Credentials) => {
   //server logic here
@@ -19,7 +20,9 @@ const getSelf = async () => {
 
 const LoginPage = () => {
 
-  const { setUser } = userAuthStore();
+  const { isAllowed } = usePermission();
+
+  const { setUser, logout: logoutFromStore } = userAuthStore();
 
   const { refetch } = useQuery({
     queryKey: ['self'],
@@ -32,11 +35,17 @@ const LoginPage = () => {
     mutationFn: loginUser,
     onSuccess: async () => {
       //getself call for user data
-      const userData = await refetch();
-      setUser(userData.data);
-      console.log('User data fetched successfully', userData.data)
+      const selfData = await refetch();
+      //logout or redirect to client UI
+      //window.location.href="http://clientui/url"
+      //"admin","manager" roles are allowed to access the admin UI
+      if (!isAllowed(selfData.data)) {
+        await logout();
+        logoutFromStore();
+        return
+      }
+      setUser(selfData.data);
 
-      console.log('Login successful')
     }
   }
   )
