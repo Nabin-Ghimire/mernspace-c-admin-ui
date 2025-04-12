@@ -30,6 +30,15 @@ const LoginPage = () => {
     enabled: false,
   });
 
+  const { mutate: logoutMutate } = useMutation({
+    mutationKey: ['logout'],
+    mutationFn: logout,
+    onSuccess: () => {
+      logoutFromStore();
+      return;
+    }
+  })
+
   const { mutate, isPending, isError, error } = useMutation({
     mutationKey: ['login'],
     mutationFn: loginUser,
@@ -40,8 +49,7 @@ const LoginPage = () => {
       //window.location.href="http://clientui/url"
       //"admin","manager" roles are allowed to access the admin UI
       if (!isAllowed(selfData.data)) {
-        await logout();
-        logoutFromStore();
+        logoutMutate();
         return
       }
       setUser(selfData.data);
