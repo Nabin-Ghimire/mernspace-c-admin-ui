@@ -1,10 +1,12 @@
 import { Navigate, NavLink, Outlet } from "react-router-dom"
-import Icon, { GiftOutlined, HomeOutlined, ProductOutlined, UserOutlined } from '@ant-design/icons'
+import Icon, { BellFilled, GiftOutlined, HomeOutlined, ProductOutlined, UserOutlined } from '@ant-design/icons'
 import { userAuthStore } from "../store"
-import { Layout, Menu, theme } from "antd";
+import { Avatar, Badge, Dropdown, Flex, Layout, Menu, Space, theme } from "antd";
 import { useState } from "react";
 import Logo from "../components/icons/Logo";
 import { ResturantIcon } from "../components/icons/Restaurants";
+import { useMutation } from "@tanstack/react-query";
+import { logout } from "../http/api";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -38,6 +40,16 @@ const items = [
 ]
 
 const Dashboard = () => {
+  const { logout: logoutFromStore } = userAuthStore();
+
+  const { mutate: logoutMutate } = useMutation({
+    mutationKey: ['logout'],
+    mutationFn: logout,
+    onSuccess: () => {
+      logoutFromStore();
+      return;
+    }
+  })
 
   const [collapsed, setCollapsed] = useState(false);
 
@@ -60,7 +72,29 @@ const Dashboard = () => {
           <Menu theme="light" defaultSelectedKeys={['/']} mode="inline" items={items} />
         </Sider>
         <Layout>
-          <Header style={{ padding: 0, background: colorBgContainer }} />
+          <Header style={{ paddingLeft: '16px', paddingRight: '16px', background: colorBgContainer }}>
+
+            <Flex gap="middle" align="start" justify="space-between">
+              <Badge text="Global" status="success" />
+              <Space size={16}>
+                <Badge dot>
+                  <BellFilled />
+                </Badge>
+                <Dropdown menu={{
+                  items: [
+                    {
+                      key: 'logout',
+                      label: 'logout',
+                      onClick: () => logoutMutate()
+                    }
+                  ]
+                }} placement="bottomRight">
+                  <Avatar style={{ backgroundColor: '#fde3cf', color: '#f56a00' }}>U</Avatar>
+                </Dropdown>
+              </Space>
+            </Flex>
+
+          </Header>
           <Content style={{ margin: '0 16px' }}>
             <div>
               <Outlet />
