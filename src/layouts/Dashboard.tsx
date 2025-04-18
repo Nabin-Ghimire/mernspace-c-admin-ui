@@ -10,36 +10,47 @@ import { logout } from "../http/api";
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const items = [
-  {
-    key: '/',
-    icon: <HomeOutlined />,
-    label: <NavLink to="/">Home</NavLink>,
-  },
-  {
-    key: '/users',
-    icon: <UserOutlined />,
-    label: <NavLink to="/users">Users</NavLink>,
-  },
-  {
-    key: '/restaurants',
-    icon: <Icon component={ResturantIcon} />,
-    label: <NavLink to="/restaurants">restaurants</NavLink>,
-  },
-  {
-    key: '/products',
-    icon: <ProductOutlined />,
-    label: <NavLink to="/products">products</NavLink>,
-  },
-  {
-    key: '/promos',
-    icon: <GiftOutlined />,
-    label: <NavLink to="/promos">promos</NavLink>,
-  },
+const getMenuItem = (role: string) => {
+  const baseItems = [
+    {
+      key: '/',
+      icon: <HomeOutlined />,
+      label: <NavLink to="/">Home</NavLink>,
+    },
+    {
+      key: '/restaurants',
+      icon: <Icon component={ResturantIcon} />,
+      label: <NavLink to="/restaurants">restaurants</NavLink>,
+    },
+    {
+      key: '/products',
+      icon: <ProductOutlined />,
+      label: <NavLink to="/products">products</NavLink>,
+    },
+    {
+      key: '/promos',
+      icon: <GiftOutlined />,
+      label: <NavLink to="/promos">promos</NavLink>,
+    },
 
-]
+  ]
 
+  if (role === 'admin') {
+
+    const menuItems = [...baseItems]
+    menuItems.splice(1, 0, {
+      key: '/users',
+      icon: <UserOutlined />,
+      label: <NavLink to="/users">Users</NavLink>,
+    },)
+
+    return menuItems;
+  }
+  return baseItems;
+
+}
 const Dashboard = () => {
+
   const { logout: logoutFromStore } = userAuthStore();
 
   const { mutate: logoutMutate } = useMutation({
@@ -58,9 +69,12 @@ const Dashboard = () => {
   } = theme.useToken();
 
   const { user } = userAuthStore();
+
   if (user === null) {
     return <Navigate to="/auth/login" replace={true} />
   }
+  const items = getMenuItem(user.role);
+
   return (
     <div>
 
