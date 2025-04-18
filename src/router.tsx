@@ -21,13 +21,14 @@ export const router = createBrowserRouter([
             element: <HomePage />
           },
           {
-            path: 'categories',
-            element: <Categories />
-          },
-          {
             path: 'users',
             element: <Users />
           },
+          {
+            path: 'categories',
+            element: <Categories />
+          },
+
 
         ]
       },
