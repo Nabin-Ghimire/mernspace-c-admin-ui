@@ -76,14 +76,13 @@ const Users = () => {
         console.log(filterName, filterValue)
       }} ><Button type='primary' icon={<PlusOutlined />} onClick={() => setDrawerOpen(true)}>Add User</Button></UserFilter>
 
-      <Button type="primary" onClick={() => setDrawerOpen(true)}>Create user</Button>
 
       <Table columns={columns} dataSource={users} rowKey={'id'} />
 
 
       <Drawer title='Create user' width={720} destroyOnClose={true} open={drawerOpen} onClose={() => {
         setDrawerOpen(false);
-        console.log()
+
       }}
 
         extra={
