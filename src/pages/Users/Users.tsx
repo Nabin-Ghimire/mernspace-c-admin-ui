@@ -1,11 +1,12 @@
-import { Breadcrumb, Space, Table } from "antd"
+import { Breadcrumb, Button, Drawer, Space, Table } from "antd"
 import { Link, Navigate } from "react-router-dom";
-import { RightOutlined } from "@ant-design/icons";
+import { PlusOutlined, RightOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { getUsers } from "../../http/api";
 import { User } from "../../types";
 import { userAuthStore } from "../../store";
 import UserFilter from "./UserFilter";
+import { useState } from "react";
 
 const columns = [
   {
@@ -39,6 +40,8 @@ const columns = [
 
 const Users = () => {
 
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   const { user } = userAuthStore();
   if (user?.role !== 'admin') {
     <Navigate to="/" replace={true} />
@@ -71,9 +74,31 @@ const Users = () => {
 
       <UserFilter onFilterChange={(filterName: string, filterValue: string) => {
         console.log(filterName, filterValue)
-      }} />
+      }} ><Button type='primary' icon={<PlusOutlined />} onClick={() => setDrawerOpen(true)}>Add User</Button></UserFilter>
+
+      <Button type="primary" onClick={() => setDrawerOpen(true)}>Create user</Button>
 
       <Table columns={columns} dataSource={users} rowKey={'id'} />
+
+
+      <Drawer title='Create user' width={720} destroyOnClose={true} open={drawerOpen} onClose={() => {
+        setDrawerOpen(false);
+        console.log()
+      }}
+
+        extra={
+          <Space>
+            <Button onClick={() => setDrawerOpen(false)}
+
+            >Cancel</Button>
+            <Button type='primary'>Submit</Button>
+          </Space>
+        }
+      >
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+      </Drawer>
 
     </Space>
 
