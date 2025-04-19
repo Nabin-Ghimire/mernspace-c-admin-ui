@@ -4,7 +4,7 @@ import { Card, Col, Input, Row, Select } from 'antd'
 
 type userFilterProps = {
   children?: React.ReactNode;
-  onFilterChange: (fiterName: string, filterValue: string) => void
+  onFilterChange: (filterName: string, filterValue: string) => void
 }
 
 const UserFilter = ({ onFilterChange, children }: userFilterProps) => {
