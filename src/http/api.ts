@@ -13,3 +13,4 @@ export const logout=()=>api.post('/auth/logout');
 
 export const getUsers=()=>api.get('/users');
 
+export const getTenants=()=>api.get('/tenants')
