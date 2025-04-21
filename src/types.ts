@@ -12,3 +12,9 @@ export type User={
   createdAt:string;
 
 }
+
+export type Tenant={
+id:number;
+name:string;
+address:string;
+}
