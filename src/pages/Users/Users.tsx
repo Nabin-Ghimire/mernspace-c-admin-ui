@@ -8,6 +8,7 @@ import { userAuthStore } from "../../store";
 import UserFilter from "./UserFilter";
 import { useState } from "react";
 import UserForm from "./forms/UserForm";
+import { PER_PAGE } from "../../constants";
 
 const columns = [
   {
@@ -49,6 +50,16 @@ const Users = () => {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  const [queryParams, setQueryParams] = useState({
+    perPage: PER_PAGE,
+    currentPage: 1,
+  })
+
+  const { user } = userAuthStore();
+  if (user?.role !== 'admin') {
+    <Navigate to="/" replace={true} />
+  }
+
   const onHandleSubmit = async () => {
     await form.validateFields();
     await userMutate(form.getFieldsValue()); //form.getFieldsValue() give all entered form values
@@ -65,15 +76,11 @@ const Users = () => {
     }
   })
 
-  const { user } = userAuthStore();
-  if (user?.role !== 'admin') {
-    <Navigate to="/" replace={true} />
-  }
-
   const { data: users, isLoading, isError, error } = useQuery({
-    queryKey: ['users'],
+    queryKey: ['users', queryParams],
     queryFn: () => {
-      return getUsers().then((res) => res.data);
+      const queryString = new URLSearchParams(queryParams as unknown as Record<string, string>).toString();
+      return getUsers(queryString).then((res) => res.data);
     },
   })
 
@@ -100,7 +107,21 @@ const Users = () => {
       }} ><Button type='primary' icon={<PlusOutlined />} onClick={() => setDrawerOpen(true)}>Add User</Button></UserFilter>
 
 
-      <Table columns={columns} dataSource={users} rowKey={'id'} />
+      <Table columns={columns} dataSource={users?.data} rowKey={'id'} pagination={
+        {
+          total: users?.total,
+          pageSize: queryParams.perPage,
+          current: queryParams.currentPage,
+          onChange: (page,) => {
+            setQueryParams((prev) => {
+              return {
+                ...prev,
+                currentPage: page,
+              }
+            })
+          }
+        }
+      } />
 
 
       <Drawer title='Create user' width={720} styles={{ body: { background: colorBgLayout } }} destroyOnClose={true} open={drawerOpen} onClose={() => {
