@@ -32,3 +32,8 @@ export type CreateTenantData={
   name:string;
   address:string;
 }
+
+export type FieldData={
+  name:string[];
+  value?:string;
+}
