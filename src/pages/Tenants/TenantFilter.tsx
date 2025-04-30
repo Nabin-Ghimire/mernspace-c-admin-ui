@@ -1,17 +1,18 @@
-import { Card, Col, Input, Row } from "antd"
+import { Card, Col, Form, Input, Row } from "antd"
 
 type tenantFilterProps = {
-  onFilterChange: (filterName: string, filterValue: string) => void
   children: React.ReactNode
 }
 
-const TenantFilter = ({ onFilterChange, children }: tenantFilterProps) => {
+const TenantFilter = ({ children }: tenantFilterProps) => {
   return (
     <Card>
       <Row style={{ justifyContent: 'space-between' }}>
         <Col >
-          <Input.Search placeholder='Search' allowClear={true}
-            onChange={(e) => onFilterChange('searchFilter', e.target.value)} />
+          <Form.Item name='q'>
+            <Input.Search placeholder='Search' allowClear={true}
+            />
+          </Form.Item>
         </Col>
         <Col>
           {children}
