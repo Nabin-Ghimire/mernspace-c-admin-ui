@@ -44,7 +44,7 @@ const columns = [
     key: "tenant",
     render: (_text: string, record: User) => {
       return (
-        <div>{record.firstName}  {record.tenant?.name}</div>
+        <div>{record.tenant?.name}</div>
       )
     },
   },
