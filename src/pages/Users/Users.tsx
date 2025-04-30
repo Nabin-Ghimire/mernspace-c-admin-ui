@@ -6,9 +6,10 @@ import { createUser, getUsers } from "../../http/api";
 import { CreateUserData, FieldData, User } from "../../types";
 import { userAuthStore } from "../../store";
 import UserFilter from "./UserFilter";
-import { useState } from "react";
+import React, { useState } from "react";
 import UserForm from "./forms/UserForm";
 import { PER_PAGE } from "../../constants";
+import { debounce } from "lodash";
 
 const columns = [
   {
@@ -60,17 +61,29 @@ const Users = () => {
 
   const onHandleSubmit = async () => {
     await form.validateFields();
-    await userMutate(form.getFieldsValue()); //form.getFieldsValue() give all entered form values
+    await userMutate(form.getFieldsValue()); //form.getFieldsValue() gives all entered form values
     form.resetFields();
     setDrawerOpen(false);
 
   }
+  const debouncedQUpdate = React.useMemo(() => {
+    return debounce((value: string | undefined) => {
+      setQueryParams((prev) => ({ ...prev, q: value }))
+    }, 1000)
+  }, [])
+
   // parsing the search query params to {q: 'query', role: 'role'} format
   const onFilterChange = (changedFields: FieldData[]) => {
     const changedFilterFields = changedFields.map((item) => ({ [item.name[0]]: item.value })).reduce((acc, item) => ({ ...acc, ...item }), {});
 
-    setQueryParams((prev) => ({ ...prev, ...changedFilterFields }));
-    console.log(changedFilterFields)
+    //for debouncing (it will wait for some time before sending the request to the server, applying to the search filter not in role)
+
+    if ('q' in changedFilterFields) {
+      debouncedQUpdate(changedFilterFields.q);
+    } else {
+      setQueryParams((prev) => ({ ...prev, ...changedFilterFields }));
+    }
+
   }
 
   const { user } = userAuthStore();
@@ -93,7 +106,7 @@ const Users = () => {
       const queryString = new URLSearchParams(filteredParams as unknown as Record<string, string>).toString();
       return getUsers(queryString).then((res) => res.data);
     },
-    placeholderData: keepPreviousData, //isLoading will be disabled so we need to use isFetching instead of isLoading
+    placeholderData: keepPreviousData, //isLoading will be disabled so we need to use isFetching instead of isLoading, because it is keeping previous data there while it is fetching, keepPreviousData will be used. 
 
   })
 
@@ -119,7 +132,9 @@ const Users = () => {
 
       <Form form={filterForm} onFieldsChange={onFilterChange} >
 
-        <UserFilter><Button type='primary' icon={<PlusOutlined />} onClick={() => setDrawerOpen(true)}>Add User</Button></UserFilter>
+        <UserFilter>
+          <Button type='primary' icon={<PlusOutlined />} onClick={() => setDrawerOpen(true)}>Add User</Button>
+        </UserFilter>
 
       </Form>
 
