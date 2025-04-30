@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { userAuthStore } from '../../store'
 import { Link, Navigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -7,8 +7,9 @@ import { Breadcrumb, Button, Drawer, Form, Space, Table } from 'antd';
 import { PlusOutlined, RightOutlined } from '@ant-design/icons';
 import TenantForm from './forms/TenantForm';
 import TenantFilter from './TenantFilter';
-import { CreateTenantData } from '../../types';
+import { CreateTenantData, FieldData } from '../../types';
 import { PER_PAGE } from '../../constants';
+import { debounce } from 'lodash';
 
 const columns = [
   {
@@ -26,7 +27,7 @@ const columns = [
 ]
 
 const Tenants = () => {
-
+  const [tenantFilter] = Form.useForm();
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
   const [opentenantDrawer, setOpentenantDrawer] = useState(false);
@@ -40,6 +41,22 @@ const Tenants = () => {
   if (user?.role !== 'admin') {
     <Navigate to='/' replace={true} />
   }
+
+  const debouncedQUpdate = React.useMemo(() => {
+    return debounce((value: string | undefined) => {
+      setQueryParams((prev) => ({ ...prev, q: value }))
+    }, 1000)
+  }, [])
+
+
+  const onTenantFilterChange = (changedFields: FieldData[]) => {
+
+    const chnagedFilterFields = changedFields.map((item) => ({ [item.name[0]]: item.value })).reduce((acc, item) => ({ ...acc, ...item }), {});
+
+    debouncedQUpdate(chnagedFilterFields.q);
+
+  }
+
 
   const onHandleSubmit = async () => {
     await form.validateFields();
@@ -62,7 +79,9 @@ const Tenants = () => {
   const { data: tenants, isLoading, isError, error } = useQuery({
     queryKey: ['tenants', queryParams],
     queryFn: () => {
-      const queryString = new URLSearchParams(queryParams as unknown as Record<string, string>).toString();
+      const filteredParams = Object.fromEntries(Object.entries(queryParams).filter((item) => !!item[1]));
+      const queryString = new URLSearchParams(filteredParams as unknown as Record<string, string>).toString();
+      console.log(queryString)
       return getTenants(queryString).then((res) => res.data);
 
     }
@@ -84,12 +103,12 @@ const Tenants = () => {
       {isLoading && <div>Loading...</div>}
       {isError && <div>{error.message}</div>}
 
-      <TenantFilter onFilterChange={(filterName, filterValue) => {
-        console.log(filterName, filterValue);
-      }}>
-        <Button type='primary' onClick={() => setOpentenantDrawer(true)} icon={<PlusOutlined />}
-        >Add Tenant</Button>
-      </TenantFilter>
+      <Form form={tenantFilter} onFieldsChange={onTenantFilterChange}>
+        <TenantFilter>
+          <Button type='primary' onClick={() => setOpentenantDrawer(true)} icon={<PlusOutlined />}
+          >Add Tenant</Button>
+        </TenantFilter>
+      </Form>
 
       <Table columns={columns} dataSource={tenants?.data} rowKey={"id"}
         pagination={
