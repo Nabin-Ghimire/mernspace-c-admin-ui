@@ -4,12 +4,11 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../../../http/client';
 
 
-const UserForm = () => {
+const UserForm = ({ isEditMode = false }: { isEditMode: boolean }) => {
   const { data: tenants } = useQuery({
     queryKey: ['tenants'],
     queryFn: () => api.get('/tenants/dropdown').then((res) => res.data)
   })
-  console.log(tenants);
   return <Row>
     <Col span={24}>
       <Space direction="vertical" size='large'>
@@ -53,26 +52,29 @@ const UserForm = () => {
           </Row>
         </Card>
 
-        <Card title="Security Info">
-          <Row gutter={20}>
-            <Col span={12}>
-              <Form.Item name='password' label='Password'
-                rules={[
-                  {
-                    required: true,
-                    message: 'Password is required'
-                  },
-                  {
-                    min: 8,
-                    message: 'Password must be at least 8 characters long'
-                  }
-                ]}>
-                <Input.Password size='large' />
-              </Form.Item>
-            </Col>
+        {
+          !isEditMode && (
+            <Card title="Security Info">
+              <Row gutter={20}>
+                <Col span={12}>
+                  <Form.Item name='password' label='Password'
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Password is required'
+                      },
+                      {
+                        min: 8,
+                        message: 'Password must be at least 8 characters long'
+                      }
+                    ]}>
+                    <Input.Password size='large' />
+                  </Form.Item>
+                </Col>
 
-          </Row>
-        </Card>
+              </Row>
+            </Card>
+          )}
 
         <Card title="Role and Tenant info">
           <Row gutter={20}>
@@ -85,7 +87,9 @@ const UserForm = () => {
                   }
                 ]}
               >
-                <Select size='large' style={{ width: '100%' }}
+                <Select
+                  id='selectBoxInUserForm'
+                  size='large' style={{ width: '100%' }}
                   onChange={() => { }}
                   placeholder='Select Role'>
 
@@ -104,7 +108,8 @@ const UserForm = () => {
                     message: 'Restaurant is required'
                   }
                 ]}>
-                <Select size='large' style={{ width: '100%' }}
+                <Select
+                  size='large' style={{ width: '100%' }}
                   onChange={() => { }}
                   placeholder='Select Restaurant'>
                   {
