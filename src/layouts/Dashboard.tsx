@@ -40,7 +40,7 @@ const getMenuItem = (role: string) => {
       label: <NavLink to="/users">Users</NavLink>,
     },)
     menuItems.splice(2, 0, {
-      key: '/restaurants',
+      key: '/tenants',
       icon: <Icon component={ResturantIcon} />,
       label: <NavLink to="/tenants">Restaurants</NavLink>,
     },)
@@ -85,7 +85,7 @@ const Dashboard = () => {
           <div className="logo">
             <Logo />
           </div>
-          <Menu theme="light" defaultSelectedKeys={['/']} mode="inline" items={items} />
+          <Menu theme="light" defaultSelectedKeys={[location.pathname]} mode="inline" items={items} />
         </Sider>
         <Layout>
           <Header style={{ paddingLeft: '16px', paddingRight: '16px', background: colorBgContainer }}>
