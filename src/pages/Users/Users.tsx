@@ -161,6 +161,9 @@ const Users = () => {
                 currentPage: page,
               }
             })
+          },
+          showTotal: (total: number, range: number[]) => {
+            return `Showing ${range[0]} - ${range[1]} of ${total} items`;//range is an array of two numbers, the first number is the first item of the current page and the second number is the last item of the current page.
           }
         }
       } />
