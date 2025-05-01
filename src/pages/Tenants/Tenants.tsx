@@ -116,15 +116,19 @@ const Tenants = () => {
             total: tenants?.total,
             current: queryParams?.currentPage,
             pageSize: queryParams.perPage,
-            onChange: (page) =>
+            onChange: (page) => {
               setQueryParams((prev) => {
                 return {
                   ...prev,
                   currentPage: page
                 }
               })
-          }
-        } />
+            },
+            showTotal: (total: number, range: number[]) => {
+              return `Showing ${range[0]} - ${range[1]} of ${total} items`;//range is an array of two numbers, the first number is the first item of the current page and the second number is the last item of the current page.
+            }
+
+          }} />
 
       <Drawer title="Create Tenant" open={opentenantDrawer} onClose={() => setOpentenantDrawer(false)} width={720} destroyOnClose={true} extra={
         <Space>
