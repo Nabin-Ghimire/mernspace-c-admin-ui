@@ -81,7 +81,6 @@ const Tenants = () => {
     queryFn: () => {
       const filteredParams = Object.fromEntries(Object.entries(queryParams).filter((item) => !!item[1]));
       const queryString = new URLSearchParams(filteredParams as unknown as Record<string, string>).toString();
-      console.log(queryString)
       return getTenants(queryString).then((res) => res.data);
 
     }
