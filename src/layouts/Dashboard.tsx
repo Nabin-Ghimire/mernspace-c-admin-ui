@@ -1,4 +1,4 @@
-import { Navigate, NavLink, Outlet } from "react-router-dom"
+import { Navigate, NavLink, Outlet, useLocation } from "react-router-dom"
 import Icon, { BellFilled, GiftOutlined, HomeOutlined, ProductOutlined, UserOutlined } from '@ant-design/icons'
 import { userAuthStore } from "../store"
 import { Avatar, Badge, Dropdown, Flex, Layout, Menu, Space, theme } from "antd";
@@ -51,6 +51,7 @@ const getMenuItem = (role: string) => {
 
 }
 const Dashboard = () => {
+  const location = useLocation();
 
   const { logout: logoutFromStore } = userAuthStore();
 
@@ -72,7 +73,7 @@ const Dashboard = () => {
   const { user } = userAuthStore();
 
   if (user === null) {
-    return <Navigate to="/auth/login" replace={true} />
+    return <Navigate to={`/auth/login?returnTo=${location.pathname}`} replace={true} />//set the returnTo query param to the current location so that we can redirect back to it after login
   }
   const items = getMenuItem(user.role);
 
