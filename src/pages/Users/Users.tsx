@@ -9,7 +9,7 @@ import UserFilter from "./UserFilter";
 import React, { useState } from "react";
 import UserForm from "./forms/UserForm";
 import { PER_PAGE } from "../../constants";
-import { debounce, update } from "lodash";
+import { debounce } from "lodash";
 
 const columns = [
   {
@@ -68,7 +68,7 @@ const Users = () => {
     if (currentEditingUser) {
 
       setDrawerOpen(true);
-      form.setFieldsValue({ ...currentEditingUser, password: '', tenantId: currentEditingUser.tenant?.id });
+      form.setFieldsValue({ ...currentEditingUser, tenantId: currentEditingUser.tenant?.id });
     }
   }, [currentEditingUser, form])
 
