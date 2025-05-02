@@ -2,12 +2,12 @@ import React, { useState } from 'react'
 import { userAuthStore } from '../../store'
 import { Link, Navigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createTenant, getTenants } from '../../http/api';
+import { createTenant, getTenants, updateTenant } from '../../http/api';
 import { Breadcrumb, Button, Drawer, Form, Space, Table } from 'antd';
 import { PlusOutlined, RightOutlined } from '@ant-design/icons';
 import TenantForm from './forms/TenantForm';
 import TenantFilter from './TenantFilter';
-import { CreateTenantData, FieldData } from '../../types';
+import { CreateTenantData, FieldData, Tenant } from '../../types';
 import { PER_PAGE } from '../../constants';
 import { debounce } from 'lodash';
 
@@ -29,8 +29,19 @@ const columns = [
 const Tenants = () => {
   const [tenantFilter] = Form.useForm();
   const [form] = Form.useForm();
+  const [currentEditingTenant, setCurrentEditingTenant] = React.useState<Tenant | null>(null);
+
+
   const queryClient = useQueryClient();
   const [opentenantDrawer, setOpentenantDrawer] = useState(false);
+
+  React.useEffect(() => {
+    if (currentEditingTenant) {
+      setOpentenantDrawer(true);
+      form.setFieldsValue(currentEditingTenant);
+    }
+  }, [currentEditingTenant, form]);
+
   const [queryParams, setQueryParams] = useState({
     perPage: PER_PAGE,
     currentPage: 1,
@@ -57,10 +68,24 @@ const Tenants = () => {
 
   }
 
+  const { mutate: updateTenantMutation } = useMutation({
+    mutationKey: ['update-tenant'],
+    mutationFn: async (data: CreateTenantData) => updateTenant(data, currentEditingTenant!.id).then((res) => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tenants'] })
+    }
+
+  })
+
 
   const onHandleSubmit = async () => {
     await form.validateFields();
-    await tenantMutate(form.getFieldsValue());
+    const isEditMode = !!currentEditingTenant;
+    if (isEditMode) {
+      await updateTenantMutation(form.getFieldsValue());
+    } else {
+      await tenantMutate(form.getFieldsValue());
+    }
     form.resetFields();
     setOpentenantDrawer(false);
 
@@ -109,7 +134,15 @@ const Tenants = () => {
         </TenantFilter>
       </Form>
 
-      <Table columns={columns} dataSource={tenants?.data} rowKey={"id"}
+      <Table columns={[...columns, {
+        title: "Action",
+        render: (_: string, record: Tenant) => {
+          return (
+            <Button onClick={() => { setCurrentEditingTenant(record) }} type='link'>
+              Edit</Button>
+          )
+        }
+      }]} dataSource={tenants?.data} rowKey={"id"}
         pagination={
           {
             total: tenants?.total,
@@ -129,12 +162,25 @@ const Tenants = () => {
 
           }} />
 
-      <Drawer title="Create Tenant" open={opentenantDrawer} onClose={() => setOpentenantDrawer(false)} width={720} destroyOnClose={true} extra={
-        <Space>
-          <Button onClick={() => { setOpentenantDrawer(false) }}>Cancel</Button>
-          <Button type='primary' onClick={onHandleSubmit}>Submit</Button>
-        </Space>
-      }>
+      <Drawer title={currentEditingTenant ? 'Edit Tenant' : 'Add Tenant'} open={opentenantDrawer}
+        onClose={() => {
+          form.resetFields();
+          setCurrentEditingTenant(null);
+          setOpentenantDrawer(false)
+        }
+        }
+        width={720}
+        destroyOnClose={true}
+        extra={
+          <Space>
+            <Button onClick={() => {
+              form.resetFields();
+              setCurrentEditingTenant(null);
+              setOpentenantDrawer(false)
+            }}>Cancel</Button>
+            <Button type='primary' onClick={onHandleSubmit}>Submit</Button>
+          </Space>
+        }>
         <Form layout='vertical' form={form} >
           <TenantForm />
         </Form>
