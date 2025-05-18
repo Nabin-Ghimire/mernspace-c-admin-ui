@@ -16,6 +16,8 @@ export const getUsers=(queryString:string)=>api.get(`${AUTH_SERVICE}/users?${que
 
 export const getTenants=(queryString:string)=>api.get(`${AUTH_SERVICE}/tenants?${queryString}`);
 
+export const getTenantsDropdown=()=>api.get(`${AUTH_SERVICE}/tenants/dropdown`);
+
 export const createUser=(user:CreateUserData)=>api.post('${AUTH_SERVICE}/users',user);
 
 export const createTenant=(tenantData:CreateTenantData)=>api.post('${AUTH_SERVICE}/tenants',tenantData);
