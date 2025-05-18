@@ -1,14 +1,14 @@
 import { Card, Col, Form, Input, Row, Select, Space } from 'antd'
 import { Tenant } from '../../../types';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '../../../http/client';
+import { getTenantsDropdown } from '../../../http/api';
 
 
 const UserForm = ({ isEditMode = false }: { isEditMode: boolean }) => {
   const selectedRole = Form.useWatch('role');
   const { data: tenants } = useQuery({
     queryKey: ['tenants'],
-    queryFn: () => api.get('/tenants/dropdown').then((res) => res.data)
+    queryFn: () => getTenantsDropdown().then((res) => res.data)
   })
   return <Row>
     <Col span={24}>
