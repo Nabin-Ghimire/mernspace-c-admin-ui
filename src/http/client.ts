@@ -1,5 +1,6 @@
 import axios from "axios";
 import { userAuthStore } from "../store";
+import { AUTH_SERVICE } from "./api";
 export const api=axios.create(
   {
     baseURL:import.meta.env.VITE_BACKEND_API_URL,
@@ -12,7 +13,7 @@ export const api=axios.create(
   });
 
 const refreshToken=async()=>{
-return await axios.post(`${import.meta.env.VITE_BACKEND_API_URL}/auth/refresh`,{},{withCredentials:true,});
+return await axios.post(`${import.meta.env.VITE_BACKEND_API_URL}${AUTH_SERVICE}/auth/refresh`,{},{withCredentials:true,});
 
 };
 //Due to post request we need to pass the empty object as data in the request body,
@@ -27,7 +28,6 @@ api.interceptors.response.use((response)=>response,async (error)=>{
       const headers={
         ...originalRequest.headers,};
       await refreshToken();
-      console.log("Token refreshed");
       return api.request({...originalRequest,headers});
     } catch (err) {
       console.error("Token refresh error",err);
