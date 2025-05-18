@@ -21,12 +21,17 @@ const getMenuItem = (role: string) => {
     {
       key: '/products',
       icon: <ProductOutlined />,
-      label: <NavLink to="/products">products</NavLink>,
+      label: <NavLink to="/products">Products</NavLink>,
+    },
+    {
+      key: '/categories',
+      icon: <ProductOutlined />,
+      label: <NavLink to="/categories">Categories</NavLink>,
     },
     {
       key: '/promos',
       icon: <GiftOutlined />,
-      label: <NavLink to="/promos">promos</NavLink>,
+      label: <NavLink to="/promos">Promos</NavLink>,
     },
 
   ]
