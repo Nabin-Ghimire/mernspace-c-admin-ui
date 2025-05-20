@@ -74,6 +74,7 @@ const Products = () => {
     placeholderData: keepPreviousData, //isLoading will be disabled so we need to use isFetching instead of isLoading, because it is keeping previous data there while it is fetching, keepPreviousData will be used. 
 
   })
+  console.logs('Products', products);
 
   const debouncedQUpdate = React.useMemo(() => {
     return debounce((value: string | undefined) => {
