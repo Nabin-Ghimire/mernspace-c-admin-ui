@@ -22,7 +22,7 @@ const ProductFilter = ({ children }: ProductFilterProps) => {
       return getCategories();
     }
   })
-  console.log(categories);
+
 
   return <Card>
     <Row justify="space-between">
