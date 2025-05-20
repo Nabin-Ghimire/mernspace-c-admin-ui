@@ -1,13 +1,15 @@
-import { Breadcrumb, Button, Flex, Form, Image, Space, Table, Tag, Typography } from "antd";
-import { PlusOutlined, RightOutlined } from "@ant-design/icons";
+import { Breadcrumb, Button, Flex, Form, Image, Space, Spin, Table, Tag, Typography } from "antd";
+import { LoadingOutlined, PlusOutlined, RightOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import ProductFilter from "./ProductFilter";
-import { Product } from "../../types";
+import { FieldData, Product } from "../../types";
 import { useState } from "react";
 import { PER_PAGE } from "../../constants";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { getProducts } from "../../http/api";
 import { format } from "date-fns";
+import { debounce } from "lodash";
+import React from "react";
 
 
 const columns = [
@@ -58,6 +60,7 @@ const Products = () => {
   const [queryParams, setQueryParams] = useState({
     perPage: PER_PAGE,
     currentPage: 1,
+
   })
 
 
@@ -71,7 +74,25 @@ const Products = () => {
     placeholderData: keepPreviousData, //isLoading will be disabled so we need to use isFetching instead of isLoading, because it is keeping previous data there while it is fetching, keepPreviousData will be used. 
 
   })
-  console.log(products);
+
+  const debouncedQUpdate = React.useMemo(() => {
+    return debounce((value: string | undefined) => {
+      setQueryParams((prev) => ({ ...prev, q: value, currentPage: 1 }));
+    }, 500)
+  }, [])
+
+  const onFilterChange = (changedFields: FieldData[]) => {
+    const changedFilterFields = changedFields.map((item) => ({ [item.name[0]]: item.value })).reduce((acc, item) => ({ ...acc, ...item }), {});
+
+    //for debouncing (it will wait for some time before sending the request to the server, applying to the search filter not in role)
+
+
+    if ('q' in changedFilterFields) {
+      debouncedQUpdate(changedFilterFields.q);
+    } else {
+      setQueryParams((prev) => ({ ...prev, ...changedFilterFields, currentPage: 1 }));
+    }
+  }
 
   return <>
 
@@ -90,9 +111,12 @@ const Products = () => {
 
         ]} />
 
+        {isFetching && (<Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />)}
+        {isError && <Typography.Text type="danger">{error.message}</Typography.Text>}
+
       </Flex>
 
-      <Form form={filterForm} onFieldsChange={() => { }} >
+      <Form form={filterForm} onFieldsChange={onFilterChange} >
 
         <ProductFilter>
           <Button type='primary' icon={<PlusOutlined />} onClick={() => { }}>Add Products</Button>
