@@ -41,7 +41,7 @@ const ProductFilter = ({ children }: ProductFilterProps) => {
 
 
           <Col span={6}>
-            <Form.Item name='category'>
+            <Form.Item name='categoryId'>
               <Select allowClear={true} style={{ width: '100%' }} placeholder='Select Category'>
                 {
                   categories?.data.map((category: Category) => {
@@ -55,7 +55,7 @@ const ProductFilter = ({ children }: ProductFilterProps) => {
           </Col>
 
           <Col span={6}>
-            <Form.Item name='restaurant'>
+            <Form.Item name='tenantId'>
               <Select allowClear={true} style={{ width: '100%' }} placeholder='Select Restaurant'>
                 {
                   restaurants?.data.tenants.map((tenant: Tenant) => {
@@ -71,7 +71,9 @@ const ProductFilter = ({ children }: ProductFilterProps) => {
 
           <Col span={6}>
             <Space>
-              <Switch defaultChecked onChange={() => { }} />
+              <Form.Item name='isPublish'>
+                <Switch defaultChecked={false} />
+              </Form.Item>
               <Typography.Text>Show only published</Typography.Text>
             </Space>
           </Col>
