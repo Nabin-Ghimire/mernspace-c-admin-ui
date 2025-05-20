@@ -1,9 +1,29 @@
+import { useQuery } from "@tanstack/react-query"
 import { Card, Col, Form, Input, Row, Select, Space, Switch, Typography } from "antd"
+import { getCategories, getTenantsDropdown } from "../../http/api"
+import { Category, Tenant } from "../../types"
+
 
 type ProductFilterProps = {
   children?: React.ReactNode
 }
 const ProductFilter = ({ children }: ProductFilterProps) => {
+
+  const { data: restaurants } = useQuery({
+    queryKey: ['restaurants'],
+    queryFn: () => {
+      return getTenantsDropdown();
+    }
+  })
+
+  const { data: categories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => {
+      return getCategories();
+    }
+  })
+  console.log(categories);
+
   return <Card>
     <Row justify="space-between">
 
@@ -21,19 +41,29 @@ const ProductFilter = ({ children }: ProductFilterProps) => {
 
 
           <Col span={6}>
-            <Form.Item name='role'>
+            <Form.Item name='category'>
               <Select allowClear={true} style={{ width: '100%' }} placeholder='Select Category'>
-                <Select.Option value="pizza">Pizza</Select.Option>
-                <Select.Option value="beverages">Beverages</Select.Option>
+                {
+                  categories?.data.map((category: Category) => {
+                    return (
+                      <Select.Option key={category._id} value={category._id}>{category.name}</Select.Option>
+                    )
+                  })
+                }
               </Select>
             </Form.Item>
           </Col>
 
           <Col span={6}>
-            <Form.Item name='role'>
+            <Form.Item name='restaurant'>
               <Select allowClear={true} style={{ width: '100%' }} placeholder='Select Restaurant'>
-                <Select.Option value="pizza">PizzaHut</Select.Option>
-                <Select.Option value="beverages">BreadHub</Select.Option>
+                {
+                  restaurants?.data.tenants.map((tenant: Tenant) => {
+                    return (
+                      <Select.Option key={tenant.id} value={tenant.id}>{tenant.name}</Select.Option>
+                    )
+                  })
+                }
               </Select>
             </Form.Item>
 
