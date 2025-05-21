@@ -10,6 +10,7 @@ import { getProducts } from "../../http/api";
 import { format } from "date-fns";
 import { debounce } from "lodash";
 import React from "react";
+import { userAuthStore } from "../../store";
 
 
 const columns = [
@@ -57,9 +58,13 @@ const columns = [
 
 const Products = () => {
   const [filterForm] = Form.useForm();
+  const { user } = userAuthStore();
+
   const [queryParams, setQueryParams] = useState({
     perPage: PER_PAGE,
     currentPage: 1,
+    tenantId: user!.role === 'manager' ? user?.tenant?.id : undefined
+
 
   })
 
