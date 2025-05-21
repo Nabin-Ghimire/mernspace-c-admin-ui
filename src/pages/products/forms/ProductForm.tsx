@@ -1,10 +1,14 @@
-import { Card, Col, Form, Input, Row, Select, Space, Typography, Upload } from "antd"
+import { Card, Col, Form, Input, Row, Select, Space, Switch, Typography, Upload } from "antd"
 import { PlusOutlined } from "@ant-design/icons"
-import { Category } from "../../../types"
+import { Category, Tenant } from "../../../types"
 import { useQuery } from "@tanstack/react-query";
-import { getCategories } from "../../../http/api";
+import { getCategories, getTenantsDropdown } from "../../../http/api";
+import Pricing from "./Pricing";
+import Attributes from "./Attributes";
 
 const ProductForm = () => {
+
+  const selectedCategory = Form.useWatch('categoryId');
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
@@ -12,6 +16,11 @@ const ProductForm = () => {
       return getCategories();
     }
   }) //if same endpoint is calling in a same render than the cache will be used/.So no tension to recreate the useQuery()
+
+  const { data: tenants } = useQuery({
+    queryKey: ['tenants'],
+    queryFn: () => getTenantsDropdown().then((res) => res.data)
+  })
 
   return (
     <Row>
@@ -86,54 +95,54 @@ const ProductForm = () => {
             </Row>
           </Card>
 
-          <Card title="Role and Tenant info">
-            <Row gutter={20}>
-              <Col span={12}>
-                <Form.Item name='role' label='Role'
+          {
+            selectedCategory &&
+            <Pricing />
+          }
+          {
+            selectedCategory &&
+            <Attributes />
+          }
+
+          <Card title="Tenant info">
+            <Row gutter={24}>
+              <Col span={24} >
+                <Form.Item name='tenantId' label='Restaurant'
                   rules={[
                     {
                       required: true,
-                      message: 'Role is required'
+                      message: 'Restaurant is required'
                     }
-                  ]}
-                >
+                  ]}>
                   <Select
-                    id='selectBoxInUserForm'
+                    allowClear={true}
                     size='large' style={{ width: '100%' }}
                     onChange={() => { }}
-                    placeholder='Select Role'>
-
-                    <Select.Option value="admin">Admin</Select.Option>
-                    <Select.Option value="manager">Manager</Select.Option>
+                    placeholder='Select Restaurant'>
+                    {
+                      tenants?.tenants.map((tenant: Tenant) => (<Select.Option value={tenant.id}>{tenant.name}</Select.Option>))
+                    }
                   </Select>
                 </Form.Item>
               </Col>
 
-              {/* {
-              selectedRole === 'manager' && (
-                <Col span={12} >
-                  <Form.Item name='tenantId' label='Restaurant'
-                    rules={[
-                      {
-                        required: true,
-                        message: 'Restaurant is required'
-                      }
-                    ]}>
-                    <Select
-                      size='large' style={{ width: '100%' }}
-                      onChange={() => { }}
-                      placeholder='Select Restaurant'>
-                      {
-                        tenants?.tenants.map((tenant: Tenant) => (<Select.Option value={tenant.id}>{tenant.name}</Select.Option>))
-                      }
-                    </Select>
+            </Row>
+          </Card>
+
+          <Card title="Other Properties">
+            <Row gutter={24}>
+              <Col span={24} >
+                <Space>
+                  <Form.Item name='isPublish'>
+                    <Switch defaultChecked={false} checkedChildren="Yes" unCheckedChildren="No" />
                   </Form.Item>
-                </Col>
-              )
-            } */}
+                  <Typography.Text style={{ marginBottom: 22, display: 'block' }}>Published</Typography.Text>
+                </Space>
+              </Col>
 
             </Row>
           </Card>
+
         </Space>
       </Col>
     </Row>
