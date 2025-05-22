@@ -5,7 +5,7 @@ const TenantForm = () => {
   return <>
     <Row>
       <Col span={24}>
-        <Space direction="vertical" size='large'>
+        <Space direction="vertical" size='large' style={{ width: '100%' }}>
           <Card title='Restaurant Name' >
             <Row gutter={20}>
               <Col span={24}>
