@@ -101,7 +101,7 @@ const ProductForm = () => {
           }
           {
             selectedCategory &&
-            <Attributes />
+            <Attributes selectedCategory={selectedCategory} />
           }
 
           <Card title="Tenant info">
