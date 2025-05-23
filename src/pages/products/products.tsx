@@ -12,6 +12,7 @@ import { debounce } from "lodash";
 import React from "react";
 import { userAuthStore } from "../../store";
 import ProductForm from "./forms/ProductForm";
+import { makeFormData } from "./helpers";
 
 
 const columns = [
@@ -122,16 +123,26 @@ const Products = () => {
       }
     }, {}) //the empty object argument is the initial value in reduce we want to return an object
 
-    const categoryId = JSON.parse(form.getFieldValue('categoryId'))._id;
+    const parsedCategoryId = JSON.parse(form.getFieldValue('categoryId'))._id;
 
-    const arrtributes = Object.entries(form.getFieldValue('attributes')).map(([key, value]) => {
+    const parsedArrtributes = Object.entries(form.getFieldValue('attributes')).map(([key, value]) => {
       return {
         name: key,
         value: value,
       }
     })
-    console.log(pricing, categoryId, arrtributes);
-    console.log('Formdata', form.getFieldsValue()); //for all fields from a form
+
+    const postData = {
+      ...form.getFieldsValue(),
+      categoryId: parsedCategoryId,
+      priceConfiguration: pricing,
+      attributes: parsedArrtributes
+    }
+
+    console.log('PostData', postData);
+    const formData = makeFormData(postData);
+
+    console.log('Formdata', formData); //for all fields from a form
   }
 
   return <>
