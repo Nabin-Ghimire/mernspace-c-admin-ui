@@ -106,8 +106,32 @@ const Products = () => {
     }
   }
 
-  const onHandleSubmit = () => {
-    console.log('submitting');
+  const onHandleSubmit = async () => {
+    const priceConfiguration = form.getFieldValue('priceConfiguration'); //for single field from a from
+    await form.validateFields();
+
+
+
+    const pricing = Object.entries(priceConfiguration).reduce((acc, [key, value]) => {
+      const parsedKey = JSON.parse(key);
+      return {
+        ...acc, [parsedKey.configurationKey]: {
+          priceType: parsedKey.priceType,
+          availableOptions: value
+        }
+      }
+    }, {}) //the empty object argument is the initial value in reduce we want to return an object
+
+    const categoryId = JSON.parse(form.getFieldValue('categoryId'))._id;
+
+    const arrtributes = Object.entries(form.getFieldValue('attributes')).map(([key, value]) => {
+      return {
+        name: key,
+        value: value,
+      }
+    })
+    console.log(pricing, categoryId, arrtributes);
+    console.log('Formdata', form.getFieldsValue()); //for all fields from a form
   }
 
   return <>
