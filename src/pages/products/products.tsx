@@ -5,8 +5,8 @@ import ProductFilter from "./ProductFilter";
 import { FieldData, Product } from "../../types";
 import { useState } from "react";
 import { PER_PAGE } from "../../constants";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getProducts } from "../../http/api";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createProduct, getProducts } from "../../http/api";
 import { format } from "date-fns";
 import { debounce } from "lodash";
 import React from "react";
@@ -107,6 +107,18 @@ const Products = () => {
     }
   }
 
+  const queryClient = useQueryClient();
+  const { mutate: productMutate } = useMutation({
+    mutationKey: ['product'],
+    mutationFn: async (data: FormData) => createProduct(data).then((res) => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      form.resetFields();
+      setDrawerOpen(false);
+      return;
+    }
+  })
+
   const onHandleSubmit = async () => {
     const priceConfiguration = form.getFieldValue('priceConfiguration'); //for single field from a from
     await form.validateFields();
@@ -134,15 +146,17 @@ const Products = () => {
 
     const postData = {
       ...form.getFieldsValue(),
+      isPublish: form.getFieldValue('isPublish') ? true : false,
+      image: form.getFieldValue('image'),
       categoryId: parsedCategoryId,
       priceConfiguration: pricing,
       attributes: parsedArrtributes
     }
 
-    console.log('PostData', postData);
-    const formData = makeFormData(postData);
 
-    console.log('Formdata', formData); //for all fields from a form
+    const formData = makeFormData(postData);
+    await productMutate(formData);
+
   }
 
   return <>
