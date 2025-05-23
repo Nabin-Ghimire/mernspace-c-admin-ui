@@ -31,3 +31,9 @@ export const updateTenant=(tenantData:CreateTenantData,id:number)=>api.patch(`${
 export const getCategories=()=>api.get(`${CATALOG_SERVICE}/categories`);
 
 export const getProducts=(queryParams:string)=>api.get(`${CATALOG_SERVICE}/products?${queryParams}`);
+
+export const createProduct=(product:FormData)=>api.post(`${CATALOG_SERVICE}/products`,product,{
+  headers: {
+    'Content-Type': 'multipart/form-data'
+  }
+});
