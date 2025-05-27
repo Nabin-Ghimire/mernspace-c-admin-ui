@@ -5,9 +5,11 @@ import { getCategories, getTenantsDropdown } from "../../../http/api";
 import Pricing from "./Pricing";
 import Attributes from "./Attributes";
 import ProductImage from "./productImage";
+import { userAuthStore } from "../../../store";
 
 const ProductForm = () => {
 
+  const { user } = userAuthStore();
   const selectedCategory = Form.useWatch('categoryId');
 
   const { data: categories } = useQuery({
@@ -93,30 +95,34 @@ const ProductForm = () => {
             <Attributes selectedCategory={selectedCategory} />
           }
 
-          <Card title="Tenant info">
-            <Row gutter={24}>
-              <Col span={24} >
-                <Form.Item name='tenantId' label='Restaurant'
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Restaurant is required'
-                    }
-                  ]}>
-                  <Select
-                    allowClear={true}
-                    size='large' style={{ width: '100%' }}
-                    onChange={() => { }}
-                    placeholder='Select Restaurant'>
-                    {
-                      tenants?.tenants.map((tenant: Tenant) => (<Select.Option value={tenant.id}>{tenant.name}</Select.Option>))
-                    }
-                  </Select>
-                </Form.Item>
-              </Col>
+          {
+            user?.role !== 'manager' && (
+              <Card title="Tenant info">
+                <Row gutter={24}>
+                  <Col span={24} >
+                    <Form.Item name='tenantId' label='Restaurant'
+                      rules={[
+                        {
+                          required: true,
+                          message: 'Restaurant is required'
+                        }
+                      ]}>
+                      <Select
+                        allowClear={true}
+                        size='large' style={{ width: '100%' }}
+                        onChange={() => { }}
+                        placeholder='Select Restaurant'>
+                        {
+                          tenants?.tenants.map((tenant: Tenant) => (<Select.Option value={tenant.id}>{tenant.name}</Select.Option>))
+                        }
+                      </Select>
+                    </Form.Item>
+                  </Col>
 
-            </Row>
-          </Card>
+                </Row>
+              </Card>
+            )
+          }
 
           <Card title="Other Properties">
             <Row gutter={24}>
