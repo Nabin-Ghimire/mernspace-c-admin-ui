@@ -37,3 +37,5 @@ export const createProduct=(product:FormData)=>api.post(`${CATALOG_SERVICE}/prod
     'Content-Type': 'multipart/form-data'
   }
 });
+
+export const getCategoryById=(id:string)=>api.get(`${CATALOG_SERVICE}/categories/${id}`);
