@@ -61,6 +61,42 @@ const columns = [
 const Products = () => {
   const [filterForm] = Form.useForm();
   const [form] = Form.useForm();
+
+  const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
+
+  React.useEffect(() => {
+    if (currentProduct) {
+      setDrawerOpen(true);
+      const priceConfiguration = Object.entries(currentProduct.priceConfiguration).reduce((acc, [key, value]) => {
+        const stringyfiedKey = JSON.stringify({
+          configurationKey: key,
+          priceType: value.priceType
+        });
+        return {
+          ...acc,
+          [stringyfiedKey]: value.availableOptions
+        }
+      }, {});
+
+      const attributes = currentProduct.attributes.reduce((acc, item) => {
+        return {
+          ...acc,
+          [item.name]: item.value
+        }
+      }, {});
+      console.log('Current Product:', currentProduct);
+      console.log(priceConfiguration, attributes);
+
+      form.setFieldsValue({
+        ...currentProduct,
+        priceConfiguration,
+        attributes,
+        categoryId: currentProduct.categoryId,
+
+      })
+    };
+  }, [currentProduct, form]);
+
   const { user } = userAuthStore();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -193,10 +229,10 @@ const Products = () => {
 
       <Table columns={[...columns, {
         title: 'Actions',
-        render: () => {
+        render: (_, record: Product) => {
           return (
             <Button onClick={() => {
-
+              setCurrentProduct(record);
             }}
               type='link'>Edit</Button>
           )
