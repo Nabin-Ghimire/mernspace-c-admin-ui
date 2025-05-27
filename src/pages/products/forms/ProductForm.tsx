@@ -1,4 +1,4 @@
-import { Card, Col, Form, Input, Row, Select, Space, Switch, Typography } from "antd"
+import { Card, Col, Form, FormInstance, Input, Row, Select, Space, Switch, Typography } from "antd"
 import { Category, Tenant } from "../../../types"
 import { useQuery } from "@tanstack/react-query";
 import { getCategories, getTenantsDropdown } from "../../../http/api";
@@ -7,7 +7,7 @@ import Attributes from "./Attributes";
 import ProductImage from "./productImage";
 import { userAuthStore } from "../../../store";
 
-const ProductForm = () => {
+const ProductForm = ({ form }: { form: FormInstance }) => {
 
   const { user } = userAuthStore();
   const selectedCategory = Form.useWatch('categoryId');
@@ -80,7 +80,7 @@ const ProductForm = () => {
           <Card title="Product Image">
             <Row gutter={20}>
               <Col span={12}>
-                <ProductImage />
+                <ProductImage initialImage={form.getFieldValue('image')} />
               </Col>
 
             </Row>
