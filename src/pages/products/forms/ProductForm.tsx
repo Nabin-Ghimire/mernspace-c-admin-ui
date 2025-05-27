@@ -57,7 +57,7 @@ const ProductForm = () => {
                     placeholder='Select Category'>
 
                     {categories?.data.map((category: Category) => (
-                      <Select.Option value={JSON.stringify(category)} key={category._id}>{category.name}</Select.Option>
+                      <Select.Option value={category._id} key={category._id}>{category.name}</Select.Option>
                     ))}
 
                   </Select>
@@ -113,7 +113,7 @@ const ProductForm = () => {
                         onChange={() => { }}
                         placeholder='Select Restaurant'>
                         {
-                          tenants?.tenants.map((tenant: Tenant) => (<Select.Option value={tenant.id}>{tenant.name}</Select.Option>))
+                          tenants?.tenants.map((tenant: Tenant) => (<Select.Option value={String(tenant.id)}>{tenant.name}</Select.Option>))
                         }
                       </Select>
                     </Form.Item>
