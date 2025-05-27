@@ -60,12 +60,18 @@ export interface Category {
     attributes: Attribute[];
 }
 
+export type ProductAttribute={
+  name:string;
+  value:string | boolean;
+}
 
 export type Product={
   _id:string;
   name:string;
   description:string;
   categoryId:Category;
+  priceConfiguration:PriceConfiguration;
+  attributes:ProductAttribute[];
   image:string,
   isPublish:boolean;
   createdAt:string; 
