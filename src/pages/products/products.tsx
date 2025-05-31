@@ -6,9 +6,9 @@ import { FieldData, Product } from "../../types";
 import { useState } from "react";
 import { PER_PAGE } from "../../constants";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createProduct, getProducts } from "../../http/api";
+import { createProduct, getProducts, updateProduct } from "../../http/api";
 import { format } from "date-fns";
-import { debounce } from "lodash";
+import { debounce, set } from "lodash";
 import React from "react";
 import { userAuthStore } from "../../store";
 import ProductForm from "./forms/ProductForm";
@@ -146,7 +146,15 @@ const Products = () => {
   const queryClient = useQueryClient();
   const { mutate: productMutate, isPending: isCreateLoading } = useMutation({
     mutationKey: ['product'],
-    mutationFn: async (data: FormData) => createProduct(data).then((res) => res.data),
+    mutationFn: async (data: FormData) => {
+      if (currentProduct) {
+        //editMode
+        return updateProduct(data, currentProduct._id).then((res) => res.data)
+      } else {
+        return createProduct(data).then((res) => res.data)
+      }
+
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       form.resetFields();
@@ -171,7 +179,7 @@ const Products = () => {
       }
     }, {}) //the empty object argument is the initial value in reduce we want to return an object
 
-    const parsedCategoryId = JSON.parse(form.getFieldValue('categoryId'))._id;
+    const parsedCategoryId = form.getFieldValue('categoryId');
 
     const parsedArrtributes = Object.entries(form.getFieldValue('attributes')).map(([key, value]) => {
       return {
@@ -256,7 +264,8 @@ const Products = () => {
         }
       } />
 
-      <Drawer title={'Add Product'} width={720} styles={{ body: { background: colorBgLayout } }} destroyOnClose={true} open={drawerOpen} onClose={() => {
+      <Drawer title={currentProduct ? "Update Product" : "Add Product"} width={720} styles={{ body: { background: colorBgLayout } }} destroyOnClose={true} open={drawerOpen} onClose={() => {
+        setCurrentProduct(null);
         form.resetFields();
         setDrawerOpen(false);
 
@@ -265,6 +274,7 @@ const Products = () => {
         extra={
           <Space>
             <Button onClick={() => {
+              setCurrentProduct(null);
               form.resetFields();
               setDrawerOpen(false);
             }}
